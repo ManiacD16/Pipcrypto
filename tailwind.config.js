@@ -9,12 +9,21 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#3B82F6",
-          dark: "#2563EB",
+          DEFAULT: "#E91E63",
+          dark: "#C2185B",
+        },
+        hybrid: {
+          pink: "#E91E63",
+          purple: "#9C27B0",
+          indigo: "#0c0a1d",
+          dark: "#070617",
         },
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],
+      },
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
       },
     },
   },

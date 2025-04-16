@@ -1,16 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../ui/Button";
 import Logo from "../../assets/Logo.svg";
 
 const Header: React.FC = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 0);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <header className="w-full py-4 px-6 md:px-12 flex items-center justify-between">
+    <header
+      className={`fixed top-0 left-0 w-full py-4 px-6 md:px-12 flex items-center justify-between z-[999] transition-all duration-300 ${
+        isScrolled ? "backdrop-blur-md bg-white/10 shadow" : "bg-transparent"
+      }`}
+    >
       {/* Logo Section */}
       <div className="flex items-center flex-shrink-0">
         <img src={Logo} alt="Near" className="h-10 w-auto" />
@@ -23,15 +34,15 @@ const Header: React.FC = () => {
           href="#"
           className="text-white hover:text-blue-400 transition-colors"
         >
-          ABOUT US
+          Home
         </a>
         <div className="relative group">
           <a
             href="#"
             className="text-white hover:text-blue-400 transition-colors flex items-center"
           >
-            OUR SERVICES
-            <svg
+            DeFi Pad
+            {/* <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4 ml-1"
               fill="none"
@@ -44,20 +55,38 @@ const Header: React.FC = () => {
                 strokeWidth={2}
                 d="M19 9l-7 7-7-7"
               />
-            </svg>
+            </svg> */}
           </a>
         </div>
         <a
           href="#"
           className="text-white hover:text-blue-400 transition-colors"
         >
-          WORK WITH US
+          Pro Pad
         </a>
         <a
           href="#"
           className="text-white hover:text-blue-400 transition-colors"
         >
-          BLOG
+          News Portal
+        </a>
+        <a
+          href="#"
+          className="text-white hover:text-blue-400 transition-colors"
+        >
+          Advertise
+        </a>
+        <a
+          href="#"
+          className="text-white hover:text-blue-400 transition-colors"
+        >
+          Whitepaper
+        </a>
+        <a
+          href="#"
+          className="text-white hover:text-blue-400 transition-colors"
+        >
+          Blog
         </a>
       </div>
 

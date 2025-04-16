@@ -7,6 +7,9 @@ import PartnersSection from "./components/sections/PartnersSection";
 import TestimonialsSection from "./components/sections/TestimonialSection";
 import JoinTeamSection from "./components/sections/JoinTeamSection";
 import ContactSection from "./components/sections/ContactSection";
+import HybridHeroSection from "./components/sections/HybridHeroSection";
+import HybridWelcomeSection from "./components/sections/HybridWelcomeSection";
+import HybridFeaturesSection from "./components/sections/HybridFeaturesSection";
 import Footer from "./components/layout/Footer";
 
 const App: React.FC = () => {
@@ -27,6 +30,12 @@ const App: React.FC = () => {
             <div className="absolute inset-0 bg-black opacity-45" />
             <div className="relative">
               <HeroSection />
+            </div>
+          </div>
+          <div className="relative">
+            <div className="absolute inset-0 bg-black opacity-45" />
+            <div className="relative">
+              <HybridHeroSection />
             </div>
           </div>
           <div className="relative">
@@ -63,6 +72,18 @@ const App: React.FC = () => {
             <div className="absolute inset-0 bg-black opacity-45" />
             <div className="relative">
               <ContactSection />
+            </div>
+          </div>
+          <div className="relative">
+            <div className="absolute inset-0 bg-black opacity-45" />
+            <div className="relative">
+              <HybridWelcomeSection />
+            </div>
+          </div>
+          <div className="relative">
+            <div className="absolute inset-0 bg-black opacity-45" />
+            <div className="relative">
+              <HybridFeaturesSection />
             </div>
           </div>
         </main>

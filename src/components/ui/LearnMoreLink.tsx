@@ -4,11 +4,11 @@ const LearnMoreLink: React.FC = () => {
   return (
     <a
       href="#"
-      className="group inline-flex items-center space-x-1 text-white font-thin relative"
+      className="group inline-flex items-center space-x-2 text-white font-thin relative"
     >
       <span>
         Learn more
-        <span className="absolute left-0 bottom-10 w-3/4 h-0.5 bg-gradient-to-br from-[#665DCD] via-[#5FA4E6] to-[#D2AB67] transform scale-x-100 transition-transform origin-left group-hover:scale-x-105" />
+        <span className="absolute left-0 -bottom-1 w-3/4 h-0.5 bg-gradient-to-br from-[#665DCD] via-[#5FA4E6] to-[#D2AB67] transform scale-x-100 transition-transform origin-left group-hover:scale-x-105" />
       </span>
       <svg
         className="ml-3 w-6 h-6 transition-transform duration-300 group-hover:translate-x-1"
