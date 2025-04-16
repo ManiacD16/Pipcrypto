@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Button from "../ui/Button";
-import Logo from "../../assets/Logo.svg";
+import Logo from "../../assets/IINGO.png";
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -24,8 +24,8 @@ const Header: React.FC = () => {
     >
       {/* Logo Section */}
       <div className="flex items-center flex-shrink-0">
-        <img src={Logo} alt="Near" className="h-10 w-auto" />
-        <span className=" text-xl font-medium text-white">PipCrypto</span>
+        <img src={Logo} alt="Near" className="h-16 w-auto" />
+        {/* <span className=" text-xl font-medium text-white">PipCrypto</span> */}
       </div>
 
       {/* Desktop Navigation */}

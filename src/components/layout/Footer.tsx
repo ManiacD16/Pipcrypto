@@ -1,5 +1,5 @@
 import React from "react";
-import Logo from "../../assets/Logo.svg";
+import Logo from "../../assets/IINGO.png";
 
 const Footer: React.FC = () => {
   return (
@@ -29,9 +29,9 @@ const Footer: React.FC = () => {
 
           <div className="flex items-center">
             <div className="flex items-center ">
-              <img src={Logo} alt="Near" className="h-10 w-auto" />
+              <img src={Logo} alt="Near" className="h-32 w-auto" />
 
-              <span className=" text-xl font-medium text-white">PipCrypto</span>
+              {/* <span className=" text-xl font-medium text-white">PipCrypto</span> */}
             </div>
           </div>
         </div>
