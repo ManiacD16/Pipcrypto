@@ -43,7 +43,7 @@ const JoinTeamSection: React.FC = () => {
 
             <a
               href="#"
-              className="group inline-flex items-center space-x-1 text-white font-thin relative inline-flex items-center text-white hover:text-blue-300 transition-colors  pb-1"
+              className="group inline-flex items-center space-x-1 text-white font-thin relative hover:text-blue-300 transition-colors  pb-1"
             >
               <span>
                 Learn more about working with us{" "}
