@@ -102,7 +102,7 @@ const Header: React.FC = () => {
           className="ml-4 flex items-center"
         >
           <div className="w-5 h-5 rounded-full mr-4 bg-gradient-to-br from-[#665DCD] via-[#5FA4E6] to-[#D2AB67]" />
-          GET IN TOUCH
+          GET AIRDROP
         </Button>
       </div>
 

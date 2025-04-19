@@ -1,12 +1,15 @@
 import React from "react";
 import { TypeAnimation } from "react-type-animation";
 import Button from "../ui/Button";
+import { useNavigate } from "react-router-dom";
 import { DropIcon } from "../ui/CryptoIcons";
+import Hashlock from "../../assets/hashlock.svg";
 import FloatingCryptoIcons from "../ui/FloatingCryptoIcons";
 
 const HybridHeroSection: React.FC = () => {
+  const navigate = useNavigate();
   return (
-    <section className="w-full min-h-screen flex flex-col items-start justify-center px-4 py-12 relative overflow-hidden">
+    <section className="w-full min-h-screen pt-32 flex flex-col items-start justify-center px-4 py-12 relative overflow-hidden">
       {/* Grid background */}
       <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none"></div>
 
@@ -97,6 +100,7 @@ const HybridHeroSection: React.FC = () => {
 
         <div className="flex flex-wrap gap-4">
           <Button
+            onClick={() => navigate("/login")}
             variant="primary"
             className="bg-gradient-to-r from-red-500 to-pink-500 hover:opacity-90 flex items-center"
           >
@@ -104,9 +108,11 @@ const HybridHeroSection: React.FC = () => {
             Get Airdrop
           </Button>
 
-          <div className="flex items-center bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-2">
-            <span className="text-gray-300 mr-2">AUDITING BY</span>
-            <span className="font-bold text-white">hashlock.</span>
+          <div className=" bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-2">
+            <div className="text-gray-300 mr-2">AUDITING BY</div>
+
+            {/* <span className="font-bold text-white">hashlock.</span> */}
+            <img src={Hashlock} alt="Hashlock" className="h-6 w-auto" />
           </div>
         </div>
 
