@@ -8,6 +8,7 @@ import {
   Clock,
   Wallet,
   LogOut,
+  ExternalLink,
 } from "lucide-react";
 import {
   useAppKitAccount,
@@ -17,14 +18,15 @@ import {
 } from "@reown/appkit/react";
 import { contractAbi } from "../contracts/Props/contractAbi";
 import { contractAddress } from "../contracts/Props/contractAddress";
+import { useNavigate } from "react-router-dom"; // Import from react-router-dom instead of next/router
 
 const DashboardSection: React.FC = () => {
+  const navigate = useNavigate(); // Use useNavigate hook from react-router-dom
   const { open } = useAppKit();
   const { address } = useAppKitAccount();
   const { walletProvider } = useAppKitProvider<Provider>("eip155");
 
   const [totalClaimed, setTotalClaimed] = useState("0");
-  const [referralCode, setReferralCode] = useState("");
   const [totalReferrals, setTotalReferrals] = useState("0");
   const [claimTime, setClaimTime] = useState({ start: 0, end: 0 });
   const [minTokens, setMinTokens] = useState({
@@ -33,6 +35,19 @@ const DashboardSection: React.FC = () => {
   });
   const [isClaimActive, setIsClaimActive] = useState(false);
   const [copySuccess, setCopySuccess] = useState("");
+  const [claimableAmount, setClaimableAmount] = useState(0);
+  const [lastClaimedTimestamp, setLastClaimedTimestamp] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [userReferralId, setUserReferralId] = useState("");
+  const [claimedUsers, setClaimedUsers] = useState<string[]>([]);
+  const [showReferralUsers, setShowReferralUsers] = useState(false);
+
+  // Check if wallet is connected, redirect if not
+  useEffect(() => {
+    if (!address) {
+      navigate("/login"); // Redirect to login page if no wallet is connected
+    }
+  }, [address, navigate]);
 
   const formatTime = (minutes: number) => {
     const date = new Date();
@@ -47,9 +62,7 @@ const DashboardSection: React.FC = () => {
 
   const checkIfClaimActive = (start: number, end: number) => {
     const now = new Date();
-    const istOffset = 5.5 * 60 * 60 * 1000;
-    const istNow = new Date(now.getTime() + istOffset);
-    const currentMinutes = istNow.getHours() * 60 + istNow.getMinutes();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
     return currentMinutes >= start && currentMinutes < end;
   };
 
@@ -62,17 +75,26 @@ const DashboardSection: React.FC = () => {
       const tx = await airdrop.claim();
       await tx.wait();
       alert("✅ Claimed Successfully!");
-      // Refresh data after claiming
       fetchData();
     } catch (err: any) {
       alert(`❌ Error: ${err.message}`);
     }
   };
 
+  const handleDisconnect = async () => {
+    await open(); // Open the wallet dialog
+    navigate("/login"); // Redirect to login page
+  };
+
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
     setCopySuccess(type);
     setTimeout(() => setCopySuccess(""), 2000);
+  };
+
+  const truncateAddress = (address: string) => {
+    if (!address) return "";
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
   const fetchData = async () => {
@@ -84,8 +106,11 @@ const DashboardSection: React.FC = () => {
       const claimed = await airdrop.totalClaimToken(address);
       setTotalClaimed(ethers.formatUnits(claimed, 6));
 
-      const refId = await airdrop.referralIds(address);
-      setReferralCode(refId);
+      // Get referral info
+      const referralData = await airdrop.getReferralInfo(address);
+      setUserReferralId(referralData[0]);
+      setClaimedUsers(referralData[2]);
+      setTotalReferrals(referralData[1].toString());
 
       const [startTime, endTime] = await Promise.all([
         airdrop.claimStartTime(),
@@ -105,39 +130,71 @@ const DashboardSection: React.FC = () => {
         perReferral: ethers.formatUnits(perRef, 6),
       });
 
-      try {
-        const codeToClaimers = await airdrop["referralCodeToClaimers"](refId);
-        setTotalReferrals(codeToClaimers.length.toString());
-      } catch (e) {
-        console.warn("referralCodeToClaimers failed", e);
-      }
+      const lastClaimed = await airdrop.lastClaimedDate(address);
+      const lastClaimedSeconds = Number(lastClaimed) * 86400 - 19800;
+      const lastTimestamp = lastClaimedSeconds;
+      setLastClaimedTimestamp(lastTimestamp);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(() => {
-      setIsClaimActive(checkIfClaimActive(claimTime.start, claimTime.end));
-    }, 60 * 1000);
+    if (address && walletProvider) {
+      fetchData();
+      const interval = setInterval(() => {
+        setIsClaimActive(checkIfClaimActive(claimTime.start, claimTime.end));
+      }, 60 * 1000);
 
-    return () => clearInterval(interval);
+      return () => clearInterval(interval);
+    }
   }, [address, walletProvider, claimTime.start, claimTime.end]);
 
-  // Calculate progress percentage for the progress bar
-  const calculateProgress = () => {
-    const nonRefTokens = parseFloat(minTokens.nonReferral);
-    const perRefTokens = parseFloat(minTokens.perReferral);
-    const totalReferred = parseInt(totalReferrals);
-    const claimed = parseFloat(totalClaimed);
-
-    const maxTokens = nonRefTokens + perRefTokens * totalReferred;
-    if (maxTokens === 0) return 0;
-
-    return Math.min((claimed / maxTokens) * 100, 100);
+  const getMaxDailyClaimable = () => {
+    const base = parseFloat(minTokens.nonReferral);
+    const perRef = parseFloat(minTokens.perReferral);
+    const refs = parseInt(totalReferrals);
+    return base + perRef * refs;
   };
 
+  useEffect(() => {
+    const maxClaimable = getMaxDailyClaimable();
+    const tokensPerSecond = maxClaimable / (24 * 60 * 60);
+    const startTime = lastClaimedTimestamp
+      ? lastClaimedTimestamp
+      : Math.floor(Date.now() / 1000);
+
+    const interval = setInterval(() => {
+      const elapsed = Math.floor(Date.now() / 1000) - startTime;
+      const claimable = Math.min(tokensPerSecond * elapsed, maxClaimable);
+      setClaimableAmount(claimable);
+      setTimeLeft(86400 - elapsed);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [lastClaimedTimestamp, minTokens, totalReferrals]);
+
+  const calculateProgress = () => {
+    const maxToday = getMaxDailyClaimable();
+    if (maxToday === 0) return 0;
+    return Math.min((claimableAmount / maxToday) * 100, 100);
+  };
+
+  const formatTimeLeft = (seconds: number) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hrs}h ${mins}m ${secs}s`;
+  };
+
+  const getExplorerURL = (address: string) => {
+    return `https://testnet.bscscan.com/address/${address}`;
+  };
+
+  // If no wallet is connected, don't render the dashboard
+  if (!address) {
+    return null; // Or a loading spinner if you prefer
+  }
   return (
     <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen pt-14 px-4 pb-16">
       <div className="max-w-5xl mx-auto">
@@ -150,7 +207,6 @@ const DashboardSection: React.FC = () => {
             Track and manage your token rewards
           </p>
         </div>
-
         {/* Wallet Card */}
         <div className="bg-gradient-to-r from-gray-800 to-gray-700 p-6 rounded-2xl shadow-xl mb-8 border border-gray-700 backdrop-blur-sm">
           <div className="flex items-center justify-between flex-wrap gap-4">
@@ -173,7 +229,7 @@ const DashboardSection: React.FC = () => {
             </div>
 
             <button
-              onClick={() => open()}
+              onClick={handleDisconnect}
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition"
               title="Disconnect Wallet"
             >
@@ -188,7 +244,6 @@ const DashboardSection: React.FC = () => {
             )}
           </div>
         </div>
-
         {/* Stats Grid */}
         <div className="grid gap-6 md:grid-cols-3 mb-8">
           {/* Referral Code Card */}
@@ -199,11 +254,11 @@ const DashboardSection: React.FC = () => {
             </h3>
             <div className="mt-2 bg-gray-900/50 p-3 rounded-lg flex justify-between items-center">
               <span className="text-xl text-purple-400 font-mono">
-                {referralCode || "--"}
+                {userReferralId || "--"}
               </span>
               <button
                 className="bg-purple-700 hover:bg-purple-600 p-2 rounded-lg transition-colors"
-                onClick={() => copyToClipboard(referralCode, "referral")}
+                onClick={() => copyToClipboard(userReferralId, "referral")}
                 title="Copy referral code"
               >
                 <Copy className="h-4 w-4" />
@@ -297,7 +352,7 @@ const DashboardSection: React.FC = () => {
 
         {/* Progress Bar */}
         <div className="bg-gradient-to-r from-gray-800 to-gray-700 p-6 rounded-2xl shadow-lg border border-gray-700 mb-8">
-          <h3 className="text-xl font-semibold mb-4">Airdrop Progress</h3>
+          <h3 className="text-xl font-semibold mb-4">Airdrop Accumulation</h3>
           <div className="w-full bg-gray-900 rounded-full h-4 mb-2">
             <div
               className="bg-gradient-to-r from-blue-500 to-purple-600 h-4 rounded-full transition-all duration-1000"
@@ -305,17 +360,13 @@ const DashboardSection: React.FC = () => {
             ></div>
           </div>
           <div className="flex justify-between text-sm text-gray-400">
-            <span>0 Tokens</span>
-            <span>
-              {(
-                parseFloat(minTokens.nonReferral) +
-                parseFloat(minTokens.perReferral) * parseInt(totalReferrals)
-              ).toFixed(2)}{" "}
-              Tokens
-            </span>
+            <span>Available: {claimableAmount.toFixed(6)} Tokens</span>
+            <span>Max/24hr: {getMaxDailyClaimable().toFixed(6)} Tokens</span>
+          </div>
+          <div className="text-sm text-gray-400 mt-2">
+            Time left for full claim: {formatTimeLeft(timeLeft)}
           </div>
         </div>
-
         {/* Claim Button */}
         <div className="text-center">
           <button
@@ -336,6 +387,71 @@ const DashboardSection: React.FC = () => {
             </p>
           )}
         </div>
+        {/* Referred Users Section */}
+        {claimedUsers.length > 0 && (
+          <div className="bg-gradient-to-r from-gray-800 to-gray-700 p-6 rounded-2xl shadow-lg border border-gray-700 mb-8 mt-8">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold flex items-center">
+                <Users className="text-blue-400 mr-2 h-5 w-5" />
+                Your Referred Users
+              </h3>
+              <button
+                onClick={() => setShowReferralUsers(!showReferralUsers)}
+                className="text-blue-400 hover:text-blue-300 text-sm"
+              >
+                {showReferralUsers ? "Hide" : "Show"} ({claimedUsers.length})
+              </button>
+            </div>
+
+            {showReferralUsers && (
+              <div className="mt-2 bg-gray-900/50 p-4 rounded-lg max-h-60 overflow-y-auto">
+                {claimedUsers.length > 0 ? (
+                  <ul className="space-y-2">
+                    {claimedUsers.map((user, index) => (
+                      <li
+                        key={index}
+                        className="flex justify-between items-center border-b border-gray-700 pb-2"
+                      >
+                        <span className="text-gray-300">
+                          {truncateAddress(user)}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() =>
+                              copyToClipboard(user, `user-${index}`)
+                            }
+                            className="text-gray-400 hover:text-white p-1"
+                            title="Copy address"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </button>
+                          <a
+                            href={getExplorerURL(user)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 p-1"
+                            title="View on explorer"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </div>
+                        {copySuccess === `user-${index}` && (
+                          <span className="text-green-400 text-xs absolute ml-40">
+                            Copied!
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-400 text-center">
+                    No users have used your referral code yet
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

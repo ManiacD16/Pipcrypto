@@ -27,6 +27,11 @@ export const contractAbi = [
     type: "error",
   },
   {
+    inputs: [{ internalType: "address", name: "token", type: "address" }],
+    name: "SafeERC20FailedOperation",
+    type: "error",
+  },
+  {
     anonymous: false,
     inputs: [
       { indexed: true, internalType: "address", name: "user", type: "address" },
@@ -243,8 +248,30 @@ export const contractAbi = [
     type: "function",
   },
   {
+    inputs: [{ internalType: "address", name: "user", type: "address" }],
+    name: "getReferralInfo",
+    outputs: [
+      { internalType: "string", name: "userReferralId", type: "string" },
+      {
+        internalType: "uint256",
+        name: "totalClaimsWithReferralId",
+        type: "uint256",
+      },
+      { internalType: "address[]", name: "claimedUsers", type: "address[]" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [{ internalType: "address", name: "", type: "address" }],
     name: "hasClaimedReferralBonus",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "hasClaimedWithoutReferral",
     outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
@@ -278,6 +305,13 @@ export const contractAbi = [
     type: "function",
   },
   {
+    inputs: [{ internalType: "bool", name: "_status", type: "bool" }],
+    name: "offerToUser",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "owner",
     outputs: [{ internalType: "address", name: "", type: "address" }],
@@ -302,23 +336,6 @@ export const contractAbi = [
     inputs: [{ internalType: "string", name: "", type: "string" }],
     name: "referralCodeToAddress",
     outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "string", name: "", type: "string" },
-      { internalType: "uint256", name: "", type: "uint256" },
-    ],
-    name: "referralCodeToClaimers",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "", type: "address" }],
-    name: "referralIds",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
     stateMutability: "view",
     type: "function",
   },
@@ -362,13 +379,6 @@ export const contractAbi = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "bool", name: "_status", type: "bool" }],
-    name: "setDeductUSDTOnClaim",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [{ internalType: "address", name: "_treasury", type: "address" }],
     name: "setTreasury",
     outputs: [],
@@ -378,13 +388,6 @@ export const contractAbi = [
   {
     inputs: [{ internalType: "address", name: "", type: "address" }],
     name: "totalClaimToken",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "", type: "address" }],
-    name: "totalReferrals",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
@@ -411,12 +414,13 @@ export const contractAbi = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
-    name: "withdrawTokens",
+    inputs: [{ internalType: "address", name: "_token", type: "address" }],
+    name: "withdraw",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
+  { stateMutability: "payable", type: "receive" },
 ];
 
 export default contractAbi;
