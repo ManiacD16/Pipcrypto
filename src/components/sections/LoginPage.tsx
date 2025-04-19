@@ -12,7 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { contractAbi } from "../contracts/Props/contractAbi";
 import { contractAddress } from "../contracts/Props/contractAddress";
 
-const usdtAddress = "0xf073d53f07451FB5f885f699a57D4169a526299e";
+const usdtAddress = "0x5D92664FC0d3CFF459a11E674fe0489DA58C6Fa7";
 
 const usdtAbi = [
   "function approve(address spender, uint256 amount) external returns (bool)",
