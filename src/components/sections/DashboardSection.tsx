@@ -16,12 +16,14 @@ import {
   Provider,
   useAppKit,
 } from "@reown/appkit/react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { contractAbi } from "../contracts/Props/contractAbi";
 import { contractAddress } from "../contracts/Props/contractAddress";
-import { useNavigate } from "react-router-dom"; // Import from react-router-dom instead of next/router
+import { useNavigate } from "react-router-dom";
 
 const DashboardSection: React.FC = () => {
-  const navigate = useNavigate(); // Use useNavigate hook from react-router-dom
+  const navigate = useNavigate();
   const { open } = useAppKit();
   const { address } = useAppKitAccount();
   const { walletProvider } = useAppKitProvider<Provider>("eip155");
@@ -34,13 +36,13 @@ const DashboardSection: React.FC = () => {
     perReferral: "0",
   });
   const [isClaimActive, setIsClaimActive] = useState(false);
-  const [copySuccess, setCopySuccess] = useState("");
   const [claimableAmount, setClaimableAmount] = useState(0);
   const [lastClaimedTimestamp, setLastClaimedTimestamp] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const [userReferralId, setUserReferralId] = useState("");
   const [claimedUsers, setClaimedUsers] = useState<string[]>([]);
   const [showReferralUsers, setShowReferralUsers] = useState(false);
+  const [isClaimLoading, setIsClaimLoading] = useState(false);
 
   // Check if wallet is connected, redirect if not
   useEffect(() => {
@@ -66,30 +68,137 @@ const DashboardSection: React.FC = () => {
     return currentMinutes >= start && currentMinutes < end;
   };
 
+  // Helper function to extract error reason from blockchain error
+  const extractErrorReason = (error: any): string => {
+    // Try to extract reason from error object
+    if (error?.reason) {
+      return error.reason;
+    }
+
+    // Try to extract from revert data
+    if (error?.data) {
+      try {
+        // Check if it's a typical solidity error string
+        if (
+          typeof error.data === "string" &&
+          error.data.startsWith("0x08c379a0")
+        ) {
+          const abiCoder = new ethers.AbiCoder();
+          const decodedError = abiCoder.decode(
+            ["string"],
+            "0x" + error.data.slice(10)
+          );
+          return decodedError[0];
+        }
+      } catch (_) {
+        // Ignore parsing errors
+      }
+    }
+
+    // Return a generic message if we can't extract a specific reason
+    return error?.message?.split("(")[0] || "Transaction failed";
+  };
+
   const handleClaim = async () => {
-    if (!walletProvider || !address) return;
+    if (!walletProvider || !address || !isClaimActive || isClaimLoading) return;
+
     try {
+      setIsClaimLoading(true);
+
+      const claimToastId = toast.info("Preparing claim transaction...", {
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+      });
+
       const provider = new BrowserProvider(walletProvider);
       const signer = await provider.getSigner();
       const airdrop = new Contract(contractAddress, contractAbi, signer);
+
+      toast.update(claimToastId, {
+        render: "Please confirm the transaction in your wallet",
+        type: "info",
+      });
+
       const tx = await airdrop.claim();
+
+      toast.update(claimToastId, {
+        render: "Transaction submitted! Waiting for confirmation...",
+        type: "info",
+      });
+
       await tx.wait();
-      alert("✅ Claimed Successfully!");
+
+      toast.update(claimToastId, {
+        render: "✅ Tokens claimed successfully!",
+        type: "success",
+        autoClose: 5000,
+      });
+
       fetchData();
     } catch (err: any) {
-      alert(`❌ Error: ${err.message}`);
+      console.error("Claim error:", err);
+
+      // Extract the error reason
+      const errorReason = extractErrorReason(err);
+
+      // Dismiss any pending toasts
+      toast.dismiss();
+
+      // Show a concise error toast with just the reason
+      toast.error(errorReason, {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+      });
+    } finally {
+      setIsClaimLoading(false);
     }
   };
 
   const handleDisconnect = async () => {
-    await open(); // Open the wallet dialog
-    navigate("/login"); // Redirect to login page
+    try {
+      await open(); // Open the wallet dialog
+      toast.info("Wallet disconnected", {
+        position: "top-center",
+        autoClose: 2000,
+      });
+      navigate("/login"); // Redirect to login page
+    } catch (error) {
+      console.error("Disconnect error:", error);
+    }
   };
 
   const copyToClipboard = (text: string, type: string) => {
+    let textToCopy = text;
     navigator.clipboard.writeText(text);
-    setCopySuccess(type);
-    setTimeout(() => setCopySuccess(""), 2000);
+    if (type === "referral") {
+      textToCopy = `https://pipcrypto.vercel.app/?ref=${text}`;
+    }
+
+    navigator.clipboard.writeText(textToCopy);
+    // Show toast based on what was copied
+    if (type === "address") {
+      toast.success("Address copied to clipboard", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+      });
+    } else if (type === "referral") {
+      toast.success("Referral code copied to clipboard", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+      });
+    } else if (type.startsWith("user-")) {
+      toast.success("User address copied to clipboard", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+      });
+    }
   };
 
   const truncateAddress = (address: string) => {
@@ -99,6 +208,13 @@ const DashboardSection: React.FC = () => {
 
   const fetchData = async () => {
     if (!walletProvider || !address) return;
+
+    const dataToastId = toast.info("Fetching your data...", {
+      autoClose: 2000,
+      hideProgressBar: true,
+      position: "bottom-right",
+    });
+
     try {
       const provider = new BrowserProvider(walletProvider);
       const airdrop = new Contract(contractAddress, contractAbi, provider);
@@ -134,8 +250,19 @@ const DashboardSection: React.FC = () => {
       const lastClaimedSeconds = Number(lastClaimed) * 86400 - 19800;
       const lastTimestamp = lastClaimedSeconds;
       setLastClaimedTimestamp(lastTimestamp);
+
+      toast.update(dataToastId, {
+        render: "Data updated successfully",
+        type: "success",
+        autoClose: 1000,
+      });
     } catch (error) {
       console.error("Error fetching data:", error);
+      toast.update(dataToastId, {
+        render: "Error loading data. Please try again.",
+        type: "error",
+        autoClose: 3000,
+      });
     }
   };
 
@@ -195,8 +322,22 @@ const DashboardSection: React.FC = () => {
   if (!address) {
     return null; // Or a loading spinner if you prefer
   }
+
   return (
     <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen pt-14 px-4 pb-16">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -236,12 +377,6 @@ const DashboardSection: React.FC = () => {
               <LogOut className="h-4 w-4" />
               <span>Disconnect</span>
             </button>
-
-            {copySuccess === "address" && (
-              <span className="text-green-400 text-sm absolute mt-16">
-                Address copied!
-              </span>
-            )}
           </div>
         </div>
         {/* Stats Grid */}
@@ -264,11 +399,6 @@ const DashboardSection: React.FC = () => {
                 <Copy className="h-4 w-4" />
               </button>
             </div>
-            {copySuccess === "referral" && (
-              <span className="text-green-400 text-sm mt-2 block">
-                Code copied!
-              </span>
-            )}
           </div>
 
           {/* Tokens Per Referral Card */}
@@ -371,14 +501,18 @@ const DashboardSection: React.FC = () => {
         <div className="text-center">
           <button
             onClick={handleClaim}
-            disabled={!isClaimActive}
+            disabled={!isClaimActive || isClaimLoading}
             className={`py-4 px-10 rounded-xl font-semibold text-white text-lg transition-all duration-300 shadow-xl transform hover:-translate-y-1 ${
-              isClaimActive
+              isClaimActive && !isClaimLoading
                 ? "bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600"
                 : "bg-gradient-to-r from-gray-700 to-gray-600 cursor-not-allowed opacity-70"
             }`}
           >
-            {isClaimActive ? "Claim Airdrop Tokens" : "Claim Not Available Now"}
+            {isClaimLoading
+              ? "Processing..."
+              : isClaimActive
+              ? "Claim Airdrop Tokens"
+              : "Claim Not Available Now"}
           </button>
 
           {!isClaimActive && (
@@ -435,11 +569,6 @@ const DashboardSection: React.FC = () => {
                             <ExternalLink className="h-3 w-3" />
                           </a>
                         </div>
-                        {copySuccess === `user-${index}` && (
-                          <span className="text-green-400 text-xs absolute ml-40">
-                            Copied!
-                          </span>
-                        )}
                       </li>
                     ))}
                   </ul>

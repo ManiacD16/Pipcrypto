@@ -1,7 +1,7 @@
 import React from "react";
 // import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "../layout/Header";
-import HeroSection from "../sections/HeroSection";
+// import HeroSection from "../sections/HeroSection";
 import AboutSection from "../sections/AboutSection";
 import ServicesSection from "../sections/ServicesSection";
 import PartnersSection from "../sections/PartnersSection";
@@ -37,13 +37,13 @@ const App: React.FC = () => {
           </div>
         </div>
         <main>
-          <div className="relative ">
+          {/* <div className="relative ">
             <div className="absolute w-[45rem] h-[45rem] overlay z-0 right-0 bottom-0 -mb-40 -mr-40 bg-[radial-gradient(circle,#665DCD,transparent_60%)] opacity-80  pointer-events-none" />
             <div className="absolute inset-0 bg-black opacity-45" />
             <div className="relative">
               <HeroSection />
             </div>
-          </div>
+          </div> */}
           <div className="  w-full ">
             <GradientLine />
           </div>

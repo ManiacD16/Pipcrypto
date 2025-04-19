@@ -20,8 +20,8 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full py-4 px-6 md:px-12 flex items-center justify-between z-[999] transition-all duration-300 ${
-        isScrolled ? "backdrop-blur-md bg-white/10 shadow" : "bg-transparent"
+      className={`fixed top-0 left-0 w-full py-4 px-6 md:px-12 flex items-center justify-between z-[999] transition-all duration-100 ${
+        isScrolled ? "backdrop-blur-md bg-white/40 shadow" : "bg-transparent"
       }`}
     >
       {/* Logo Section */}
