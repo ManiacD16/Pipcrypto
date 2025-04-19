@@ -2,6 +2,7 @@ import React from "react";
 import { TypeAnimation } from "react-type-animation";
 import Button from "../ui/Button";
 import { DropIcon } from "../ui/CryptoIcons";
+import FloatingCryptoIcons from "../ui/FloatingCryptoIcons";
 
 const HybridHeroSection: React.FC = () => {
   return (
@@ -10,16 +11,12 @@ const HybridHeroSection: React.FC = () => {
       <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none"></div>
 
       {/* Floating crypto icons */}
-      <div className="absolute right-0 top-0 w-full h-full pointer-events-none">
-        <div className="absolute top-[20%] right-[10%] w-16 h-16 bg-red-500 rounded-full opacity-70 animate-float"></div>
-        <div className="absolute top-[40%] right-[30%] w-12 h-12 bg-blue-500 rounded-full opacity-70 animate-float-delay"></div>
-        <div className="absolute top-[30%] right-[20%] w-20 h-20 bg-yellow-500 rounded-full opacity-70 animate-float-long"></div>
-        <div className="absolute top-[60%] right-[15%] w-14 h-14 bg-purple-500 rounded-full opacity-70 animate-float"></div>
-        <div className="absolute top-[70%] right-[40%] w-16 h-16 bg-green-500 rounded-full opacity-70 animate-float-delay"></div>
+      <div className="absolute cover mx-auto z-10 right-0 lg:w-1/2 w-full">
+        <FloatingCryptoIcons />
       </div>
 
       <div className="container mx-auto z-10">
-        <div className="inline-block bg-red-500 text-white px-4 py-2 rounded-full mb-6">
+        <div className="inline-block bg-gradient-to-br from-pink-500 to-purple-500 text-white px-4 py-2 rounded-full mb-6">
           <span className="flex items-center">
             <svg
               className="w-5 h-5 mr-2"

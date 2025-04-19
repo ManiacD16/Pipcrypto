@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Button from "../ui/Button";
-import Logo from "../../assets/IINGO.png";
+import Logo from "../../assets/Logo1.png";
+import { useNavigate } from "react-router-dom";
 
 const Header: React.FC = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -24,24 +26,25 @@ const Header: React.FC = () => {
     >
       {/* Logo Section */}
       <div className="flex items-center flex-shrink-0">
-        <img src={Logo} alt="Near" className="h-16 w-auto" />
-        {/* <span className=" text-xl font-medium text-white">PipCrypto</span> */}
+        <img src={Logo} alt="Near" className="h-10 w-auto" />
+        {/* <span className=" text-xl font-medium text-white">IINGO</span> */}
       </div>
 
       {/* Desktop Navigation */}
-      <div className="hidden lg:flex flex-1 items-center justify-center space-x-8">
+      <div className="hidden lg:flex flex-1 items-center justify-center space-x-20">
         <a
           href="#"
           className="text-white hover:text-blue-400 transition-colors"
         >
           Home
         </a>
+        <div className="w-1 h-8 text-transparent bg-gradient-to-br from-[#665DCD] via-[#5FA4E6] to-[#D2AB67] mr-3 rounded-sm"></div>
         <div className="relative group">
           <a
             href="#"
             className="text-white hover:text-blue-400 transition-colors flex items-center"
           >
-            DeFi Pad
+            Pre Sale
             {/* <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4 ml-1"
@@ -58,13 +61,14 @@ const Header: React.FC = () => {
             </svg> */}
           </a>
         </div>
-        <a
+        <div className="w-1 h-8 text-transparent bg-gradient-to-br from-[#665DCD] via-[#5FA4E6] to-[#D2AB67] mr-3 rounded-sm"></div>
+        {/* <a
           href="#"
           className="text-white hover:text-blue-400 transition-colors"
         >
           Pro Pad
-        </a>
-        <a
+        </a> */}
+        {/* <a
           href="#"
           className="text-white hover:text-blue-400 transition-colors"
         >
@@ -75,24 +79,28 @@ const Header: React.FC = () => {
           className="text-white hover:text-blue-400 transition-colors"
         >
           Advertise
-        </a>
+        </a> */}
         <a
           href="#"
           className="text-white hover:text-blue-400 transition-colors"
         >
           Whitepaper
         </a>
-        <a
+        {/* <a
           href="#"
           className="text-white hover:text-blue-400 transition-colors"
         >
           Blog
-        </a>
+        </a> */}
       </div>
 
       {/* CTA Button */}
       <div className="hidden lg:flex flex-shrink-0">
-        <Button variant="secondary" className="ml-4 flex items-center">
+        <Button
+          onClick={() => navigate("/login")}
+          variant="secondary"
+          className="ml-4 flex items-center"
+        >
           <div className="w-5 h-5 rounded-full mr-4 bg-gradient-to-br from-[#665DCD] via-[#5FA4E6] to-[#D2AB67]" />
           GET IN TOUCH
         </Button>
@@ -144,7 +152,9 @@ const Header: React.FC = () => {
             >
               BLOG
             </a>
-            <Button variant="primary">GET IN TOUCH</Button>
+            <Button variant="primary" onClick={() => navigate("/login")}>
+              GET IN TOUCH
+            </Button>
           </div>
         </div>
       )}

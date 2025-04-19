@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
           <div className="mb-8 md:mb-0">
             <div className="uppercase text-sm font-semibold text-gray-400 mb-4">
-              PIPCRYPTO TEAM
+              IINGO TEAM
             </div>
 
             <nav className="flex flex-col space-y-2">
@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
             <div className="flex items-center ">
               <img src={Logo} alt="Near" className="h-32 w-auto" />
 
-              {/* <span className=" text-xl font-medium text-white">PipCrypto</span> */}
+              {/* <span className=" text-xl font-medium text-white">IINGO</span> */}
             </div>
           </div>
         </div>
@@ -45,7 +45,7 @@ const Footer: React.FC = () => {
             </a>
           </div>
           <div className=" text-right text-gray-500 text-sm">
-            ©2022 Pipcrypto Team. All Rights Reserved
+            ©2022 IINGO Team. All Rights Reserved
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 {
-  "name": "pipcrypto-landing",
+  "name": "iingo-landing",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,10 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "framer-motion": "^12.7.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.5.0",
-    "react-type-animation": "^3.2.0"
+    "react-type-animation": "^3.2.0",
+    "@reown/appkit": "^1.6.8",
+    "@reown/appkit-adapter-ethers": "^1.6.8",
+    "ethers": "^6.13.5"
   },
   "devDependencies": {
     "@types/node": "^20.8.2",

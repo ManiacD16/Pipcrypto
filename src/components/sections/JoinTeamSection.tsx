@@ -22,7 +22,7 @@ const JoinTeamSection: React.FC = () => {
             <h2 className="relative z-10 text-2xl md:text-5xl font-semibold text-white mb-6">
               Join
               <br />
-              Pipcrypto Team
+              IINGO Team
             </h2>
           </div>
 
@@ -34,8 +34,8 @@ const JoinTeamSection: React.FC = () => {
             </p>
 
             <p className="text-gray-300 mb-8">
-              As we emphasize it in our name – Pipcrypto Team, we are a team. A
-              team of bright, talented people, each masters of their specialty,
+              As we emphasize it in our name – IINGO Team, we are a team. A team
+              of bright, talented people, each masters of their specialty,
               curious about the world and eager to solve the new exciting
               cryptocurrency market problems, build cool stuff and have fun
               whilst doing so!

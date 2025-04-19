@@ -27,5 +27,24 @@ export default {
       },
     },
   },
+  keyframes: {
+    orbit: {
+      "0%": {
+        transform: "rotate(var(--start-angle)) translateX(var(--orbit-radius))",
+      },
+      "100%": {
+        transform:
+          "rotate(calc(var(--start-angle) + 360deg)) translateX(var(--orbit-radius))",
+      },
+    },
+    pulse: {
+      "0%, 100%": { transform: "scale(1)" },
+      "50%": { transform: "scale(1.05)" },
+    },
+  },
+  animation: {
+    orbit: "orbit var(--orbit-speed) linear infinite",
+    pulse: "pulse 3s ease-in-out infinite",
+  },
   plugins: [],
 };

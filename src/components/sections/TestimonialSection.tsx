@@ -4,19 +4,19 @@ import React, { useState, useEffect } from "react";
 const testimonials = [
   {
     id: 1,
-    text: "Since 2019, Pipcrypto team has been an astounding market maker for Bitkub. They have proven themselves to be one of the most consistent, committed and driven market makers on our exchange. Pipcrypto Team has contributed high-quality volume and has proven to be very reliable and trustworthy partner. We strongly advocate Pipcrypto Team as they have been an indispensable part of our market-making team.",
+    text: "Since 2019, IINGO team has been an astounding market maker for Bitkub. They have proven themselves to be one of the most consistent, committed and driven market makers on our exchange. IINGO Team has contributed high-quality volume and has proven to be very reliable and trustworthy partner. We strongly advocate IINGO Team as they have been an indispensable part of our market-making team.",
     author: "Atthakrit Chimplapibul",
     position: "CEO, Bitkub",
   },
   {
     id: 2,
-    text: "Pipcrypto has been instrumental in providing liquidity for our exchange since we partnered with them. Their team's expertise in market making has significantly improved our trading volumes and market stability.",
+    text: "IINGO has been instrumental in providing liquidity for our exchange since we partnered with them. Their team's expertise in market making has significantly improved our trading volumes and market stability.",
     author: "Sarah Johnson",
     position: "COO, CryptoExchange",
   },
   {
     id: 3,
-    text: "Working with Pipcrypto has been a game-changer for our token. Their market making services have helped us maintain consistent liquidity and price stability during both bull and bear markets.",
+    text: "Working with IINGO has been a game-changer for our token. Their market making services have helped us maintain consistent liquidity and price stability during both bull and bear markets.",
     author: "Michael Chen",
     position: "Founder, TokenProject",
   },

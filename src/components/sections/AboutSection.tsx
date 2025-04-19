@@ -14,14 +14,14 @@ const AboutSection: React.FC = () => {
       <div className="max-w-5xl mx-auto px-4">
         {/* Heading */}
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-6">
-          About Pipcrypto Team
+          About IINGO Team
         </h2>
 
         {/* Subheading */}
         <p className="text-gray-300 text-center max-w-2xl mx-auto text-lg mb-16">
-          At Pipcrypto Team, we are on the mission to balance the supply and
-          demand across crypto markets worldwide. We are a crypto native market
-          maker founded by traders, developers, and innovators who are strong
+          At IINGO Team, we are on the mission to balance the supply and demand
+          across crypto markets worldwide. We are a crypto native market maker
+          founded by traders, developers, and innovators who are strong
           believers and supporters of the future of decentralization and digital
           assets.
         </p>
@@ -78,7 +78,7 @@ const AboutSection: React.FC = () => {
               title: "~30",
               subtitle: (
                 <>
-                  Pipcrypto Teammates <br /> (& growing)
+                  IINGO Teammates <br /> (& growing)
                 </>
               ),
               gradient: true,
