@@ -56,7 +56,7 @@ const TokenBurnChart = () => {
         from circulation. Track real-time burn progress below.
       </motion.p>
 
-      <div className="flex flex-col md:flex-row w-full max-w-4xl justify-around gap-8">
+      <div className="flex flex-col md:flex-row w-full max-w-4xl justify-around gap-12">
         <ChartGauge
           title="Total will be burned"
           percentage={burnPercentage}
@@ -129,12 +129,12 @@ const ChartGauge = ({
           </AnimatePresence>
 
           {/* Percentage Counter */}
-          <AnimatedCounter value={percentage} x={80} y={55} />
+          <AnimatedCounter value={percentage} x={80} y={70} />
         </svg>
 
         {/* Min and Max Labels */}
-        <div className="absolute bottom-0 left-0 text-white text-sm">0%</div>
-        <div className="absolute bottom-0 right-0 text-white text-sm">100%</div>
+        {/* <div className="absolute bottom-0 left-0 text-white text-sm">0%</div>
+        <div className="absolute bottom-0 right-0 text-white text-sm">100%</div> */}
       </div>
     </motion.div>
   );

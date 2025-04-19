@@ -9,6 +9,8 @@ import {
   Wallet,
   LogOut,
   ExternalLink,
+  BarChart3,
+  CoinsIcon,
 } from "lucide-react";
 import {
   useAppKitAccount,
@@ -27,7 +29,6 @@ const DashboardSection: React.FC = () => {
   const { open } = useAppKit();
   const { address } = useAppKitAccount();
   const { walletProvider } = useAppKitProvider<Provider>("eip155");
-
   const [totalClaimed, setTotalClaimed] = useState("0");
   const [totalReferrals, setTotalReferrals] = useState("0");
   const [claimTime, setClaimTime] = useState({ start: 0, end: 0 });
@@ -43,6 +44,9 @@ const DashboardSection: React.FC = () => {
   const [claimedUsers, setClaimedUsers] = useState<string[]>([]);
   const [showReferralUsers, setShowReferralUsers] = useState(false);
   const [isClaimLoading, setIsClaimLoading] = useState(false);
+  // New state variables for the additional boxes
+  const [totalContractClaimed, setTotalContractClaimed] = useState("0");
+  const [totalContractUsers, setTotalContractUsers] = useState("0");
 
   // Check if wallet is connected, redirect if not
   useEffect(() => {
@@ -51,13 +55,14 @@ const DashboardSection: React.FC = () => {
     }
   }, [address, navigate]);
 
+  // Modified formatTime function to use 24-hour format
   const formatTime = (minutes: number) => {
     const date = new Date();
     date.setHours(0, minutes, 0, 0);
     return date.toLocaleTimeString("en-IN", {
-      hour: "numeric",
+      hour: "2-digit",
       minute: "2-digit",
-      hour12: true,
+      hour12: false,
       timeZone: "Asia/Kolkata",
     });
   };
@@ -74,7 +79,6 @@ const DashboardSection: React.FC = () => {
     if (error?.reason) {
       return error.reason;
     }
-
     // Try to extract from revert data
     if (error?.data) {
       try {
@@ -94,57 +98,44 @@ const DashboardSection: React.FC = () => {
         // Ignore parsing errors
       }
     }
-
     // Return a generic message if we can't extract a specific reason
     return error?.message?.split("(")[0] || "Transaction failed";
   };
 
   const handleClaim = async () => {
     if (!walletProvider || !address || !isClaimActive || isClaimLoading) return;
-
     try {
       setIsClaimLoading(true);
-
       const claimToastId = toast.info("Preparing claim transaction...", {
         autoClose: false,
         closeOnClick: false,
         draggable: false,
       });
-
       const provider = new BrowserProvider(walletProvider);
       const signer = await provider.getSigner();
       const airdrop = new Contract(contractAddress, contractAbi, signer);
-
       toast.update(claimToastId, {
         render: "Please confirm the transaction in your wallet",
         type: "info",
       });
-
       const tx = await airdrop.claim();
-
       toast.update(claimToastId, {
         render: "Transaction submitted! Waiting for confirmation...",
         type: "info",
       });
-
       await tx.wait();
-
       toast.update(claimToastId, {
         render: "✅ Tokens claimed successfully!",
         type: "success",
         autoClose: 5000,
       });
-
       fetchData();
     } catch (err: any) {
       console.error("Claim error:", err);
-
       // Extract the error reason
       const errorReason = extractErrorReason(err);
-
       // Dismiss any pending toasts
       toast.dismiss();
-
       // Show a concise error toast with just the reason
       toast.error(errorReason, {
         position: "top-center",
@@ -177,7 +168,6 @@ const DashboardSection: React.FC = () => {
     if (type === "referral") {
       textToCopy = `https://pipcrypto.vercel.app/?ref=${text}`;
     }
-
     navigator.clipboard.writeText(textToCopy);
     // Show toast based on what was copied
     if (type === "address") {
@@ -208,17 +198,14 @@ const DashboardSection: React.FC = () => {
 
   const fetchData = async () => {
     if (!walletProvider || !address) return;
-
     const dataToastId = toast.info("Fetching your data...", {
       autoClose: 2000,
       hideProgressBar: true,
       position: "bottom-right",
     });
-
     try {
       const provider = new BrowserProvider(walletProvider);
       const airdrop = new Contract(contractAddress, contractAbi, provider);
-
       const claimed = await airdrop.totalClaimToken(address);
       setTotalClaimed(ethers.formatUnits(claimed, 6));
 
@@ -232,7 +219,6 @@ const DashboardSection: React.FC = () => {
         airdrop.claimStartTime(),
         airdrop.claimEndTime(),
       ]);
-
       setClaimTime({ start: Number(startTime), end: Number(endTime) });
       setIsClaimActive(checkIfClaimActive(Number(startTime), Number(endTime)));
 
@@ -240,7 +226,6 @@ const DashboardSection: React.FC = () => {
         airdrop.minTokensForNonReferral(),
         airdrop.minTokensPerReferral(),
       ]);
-
       setMinTokens({
         nonReferral: ethers.formatUnits(nonRef, 6),
         perReferral: ethers.formatUnits(perRef, 6),
@@ -250,6 +235,15 @@ const DashboardSection: React.FC = () => {
       const lastClaimedSeconds = Number(lastClaimed) * 86400 - 19800;
       const lastTimestamp = lastClaimedSeconds;
       setLastClaimedTimestamp(lastTimestamp);
+
+      // Fetch additional data for the new boxes
+      const [totalAirdropClaim, totalUsers] = await Promise.all([
+        airdrop.totalAirdropClaim(),
+        airdrop.totalUsers(),
+      ]);
+
+      setTotalContractClaimed(ethers.formatUnits(totalAirdropClaim, 6));
+      setTotalContractUsers(totalUsers.toString());
 
       toast.update(dataToastId, {
         render: "Data updated successfully",
@@ -272,7 +266,6 @@ const DashboardSection: React.FC = () => {
       const interval = setInterval(() => {
         setIsClaimActive(checkIfClaimActive(claimTime.start, claimTime.end));
       }, 60 * 1000);
-
       return () => clearInterval(interval);
     }
   }, [address, walletProvider, claimTime.start, claimTime.end]);
@@ -290,14 +283,14 @@ const DashboardSection: React.FC = () => {
     const startTime = lastClaimedTimestamp
       ? lastClaimedTimestamp
       : Math.floor(Date.now() / 1000);
-
     const interval = setInterval(() => {
       const elapsed = Math.floor(Date.now() / 1000) - startTime;
       const claimable = Math.min(tokensPerSecond * elapsed, maxClaimable);
       setClaimableAmount(claimable);
-      setTimeLeft(86400 - elapsed);
+      // Calculate time left, ensuring it's not negative
+      const remaining = Math.max(0, 86400 - elapsed);
+      setTimeLeft(remaining);
     }, 2000);
-
     return () => clearInterval(interval);
   }, [lastClaimedTimestamp, minTokens, totalReferrals]);
 
@@ -308,6 +301,10 @@ const DashboardSection: React.FC = () => {
   };
 
   const formatTimeLeft = (seconds: number) => {
+    // If seconds is negative or zero, return "0h 0m 0s"
+    if (seconds <= 0) {
+      return "0h 0m 0s";
+    }
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
@@ -316,6 +313,13 @@ const DashboardSection: React.FC = () => {
 
   const getExplorerURL = (address: string) => {
     return `https://testnet.bscscan.com/address/${address}`;
+  };
+
+  // Function to format large numbers with commas
+  const formatWithCommas = (value: string) => {
+    return parseFloat(value).toLocaleString("en-US", {
+      maximumFractionDigits: 0,
+    });
   };
 
   // If no wallet is connected, don't render the dashboard
@@ -337,7 +341,6 @@ const DashboardSection: React.FC = () => {
         pauseOnHover
         theme="dark"
       />
-
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -348,6 +351,7 @@ const DashboardSection: React.FC = () => {
             Track and manage your token rewards
           </p>
         </div>
+
         {/* Wallet Card */}
         <div className="bg-gradient-to-r from-gray-800 to-gray-700 p-6 rounded-2xl shadow-xl mb-8 border border-gray-700 backdrop-blur-sm">
           <div className="flex items-center justify-between flex-wrap gap-4">
@@ -355,7 +359,6 @@ const DashboardSection: React.FC = () => {
               <Wallet className="text-blue-400 mr-3 h-6 w-6" />
               <h3 className="text-xl font-semibold">Connected Wallet</h3>
             </div>
-
             <div className="flex items-center gap-2 bg-gray-900/60 px-4 py-2 rounded-lg max-w-full">
               <p className="text-md break-all text-green-400 truncate">
                 {address}
@@ -368,7 +371,6 @@ const DashboardSection: React.FC = () => {
                 <Copy className="h-4 w-4" />
               </button>
             </div>
-
             <button
               onClick={handleDisconnect}
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition"
@@ -379,6 +381,54 @@ const DashboardSection: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* New Analytics Section - Added 3 new boxes */}
+        <div className="bg-gradient-to-br from-gray-800 to-gray-700 p-6 rounded-2xl shadow-lg border border-gray-700 mb-8">
+          <h3 className="text-xl font-semibold mb-4 flex items-center">
+            <BarChart3 className="text-blue-400 mr-2 h-5 w-5" />
+            Global Statistics
+          </h3>
+          <div className="grid gap-6 md:grid-cols-3">
+            {/* Total Tokens Claimed (Contract-wide) */}
+            <div className="bg-gray-900/50 p-4 rounded-lg transform transition-all duration-300 hover:scale-105">
+              <h4 className="text-lg font-medium text-gray-300 mb-2 flex items-center">
+                <Award className="text-purple-400 mr-2 h-4 w-4" />
+                Total Tokens Claimed
+              </h4>
+              <p className="text-2xl font-bold text-purple-400">
+                {formatWithCommas(totalContractClaimed)}
+              </p>
+              <p className="text-gray-400 text-xs mt-1">
+                tokens distributed so far
+              </p>
+            </div>
+
+            {/* Total Users */}
+            <div className="bg-gray-900/50 p-4 rounded-lg transform transition-all duration-300 hover:scale-105">
+              <h4 className="text-lg font-medium text-gray-300 mb-2 flex items-center">
+                <Users className="text-blue-400 mr-2 h-4 w-4" />
+                Total Users
+              </h4>
+              <p className="text-2xl font-bold text-blue-400">
+                {formatWithCommas(totalContractUsers)}
+              </p>
+              <p className="text-gray-400 text-xs mt-1">
+                participants in the airdrop
+              </p>
+            </div>
+
+            {/* Total Supply */}
+            <div className="bg-gray-900/50 p-4 rounded-lg transform transition-all duration-300 hover:scale-105">
+              <h4 className="text-lg font-medium text-gray-300 mb-2 flex items-center">
+                <CoinsIcon className="text-green-400 mr-2 h-4 w-4" />
+                Total IINGO Supply
+              </h4>
+              <p className="text-2xl font-bold text-green-400">21,000,000</p>
+              <p className="text-gray-400 text-xs mt-1">maximum token supply</p>
+            </div>
+          </div>
+        </div>
+
         {/* Stats Grid */}
         <div className="grid gap-6 md:grid-cols-3 mb-8">
           {/* Referral Code Card */}
@@ -421,15 +471,13 @@ const DashboardSection: React.FC = () => {
           <div className="bg-gradient-to-br from-gray-800 to-gray-700 p-6 rounded-2xl shadow-lg border border-gray-700 transform transition-all duration-300 hover:scale-105">
             <h3 className="text-xl font-semibold mb-3 flex items-center">
               <Award className="text-pink-400 mr-2 h-5 w-5" />
-              Base Tokens
+              Per Day Mine Limit
             </h3>
             <div className="mt-2">
               <p className="text-3xl font-bold text-pink-400">
                 {minTokens.nonReferral}
               </p>
-              <p className="text-gray-400 text-sm mt-1">
-                tokens without referrals
-              </p>
+              <p className="text-gray-400 text-sm mt-1">tokens per day</p>
             </div>
           </div>
 
@@ -463,11 +511,11 @@ const DashboardSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Claim Window Card */}
+          {/* Claim Window Card - UPDATED WITH 24-HOUR FORMAT */}
           <div className="bg-gradient-to-br from-gray-800 to-gray-700 p-6 rounded-2xl shadow-lg border border-gray-700 transform transition-all duration-300 hover:scale-105">
             <h3 className="text-xl font-semibold mb-3 flex items-center">
               <Clock className="text-cyan-400 mr-2 h-5 w-5" />
-              Daily Claim Window
+              Claim Time Frame
             </h3>
             <div className="mt-2">
               <p className="text-xl font-medium text-cyan-400">
@@ -497,6 +545,7 @@ const DashboardSection: React.FC = () => {
             Time left for full claim: {formatTimeLeft(timeLeft)}
           </div>
         </div>
+
         {/* Claim Button */}
         <div className="text-center">
           <button
@@ -514,13 +563,13 @@ const DashboardSection: React.FC = () => {
               ? "Claim Airdrop Tokens"
               : "Claim Not Available Now"}
           </button>
-
           {!isClaimActive && (
             <p className="text-gray-400 mt-3">
               Come back during the daily claim window
             </p>
           )}
         </div>
+
         {/* Referred Users Section */}
         {claimedUsers.length > 0 && (
           <div className="bg-gradient-to-r from-gray-800 to-gray-700 p-6 rounded-2xl shadow-lg border border-gray-700 mb-8 mt-8">
@@ -536,7 +585,6 @@ const DashboardSection: React.FC = () => {
                 {showReferralUsers ? "Hide" : "Show"} ({claimedUsers.length})
               </button>
             </div>
-
             {showReferralUsers && (
               <div className="mt-2 bg-gray-900/50 p-4 rounded-lg max-h-60 overflow-y-auto">
                 {claimedUsers.length > 0 ? (

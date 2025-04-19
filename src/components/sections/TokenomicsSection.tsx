@@ -19,7 +19,7 @@ const TokenomicsSection = () => {
   const [isInView, setIsInView] = useState(false);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [activeSegment, setActiveSegment] = useState<number | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  // const [isMobile, setIsMobile] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
   // Define interfaces for our chart data
@@ -51,16 +51,16 @@ const TokenomicsSection = () => {
     }, 500);
 
     // Check if mobile device
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+    // const checkMobile = () => {
+    //   setIsMobile(window.innerWidth < 768);
+    // };
 
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
+    // checkMobile();
+    // window.addEventListener("resize", checkMobile);
 
     return () => {
       clearTimeout(timer);
-      window.removeEventListener("resize", checkMobile);
+      //   window.removeEventListener("resize", checkMobile);
     };
   }, []);
 
@@ -167,32 +167,32 @@ const TokenomicsSection = () => {
   };
 
   // Calculate label positions - different for mobile and desktop
-  const getLabelPosition = (item: TokenomicItem, index: number) => {
-    const size = 300;
-    const center = size / 2;
-    // Use different radius for mobile
-    const labelRadius = isMobile
-      ? size * 0.25 // Shorter distance on mobile
-      : size * 0.42; // Normal distance on desktop
+  // const getLabelPosition = (item: TokenomicItem, index: number) => {
+  //   const size = 300;
+  //   const center = size / 2;
+  //   // Use different radius for mobile
+  //   const labelRadius = isMobile
+  //     ? size * 0.25 // Shorter distance on mobile
+  //     : size * 0.42; // Normal distance on desktop
 
-    // Calculate the angle for the middle of this segment
-    let angleBeforeThis = tokenomicsData
-      .slice(0, index)
-      .reduce((acc, curr) => acc + curr.percentage, 0);
+  //   // Calculate the angle for the middle of this segment
+  //   let angleBeforeThis = tokenomicsData
+  //     .slice(0, index)
+  //     .reduce((acc, curr) => acc + curr.percentage, 0);
 
-    const middleAngle =
-      -Math.PI / 2 +
-      ((angleBeforeThis + item.percentage / 2) / totalPercentage) * 2 * Math.PI;
+  //   const middleAngle =
+  //     -Math.PI / 2 +
+  //     ((angleBeforeThis + item.percentage / 2) / totalPercentage) * 2 * Math.PI;
 
-    // Calculate position
-    const x = center + labelRadius * Math.cos(middleAngle);
-    const y = center + labelRadius * Math.sin(middleAngle);
+  //   // Calculate position
+  //   const x = center + labelRadius * Math.cos(middleAngle);
+  //   const y = center + labelRadius * Math.sin(middleAngle);
 
-    // Determine if label should be on left or right side
-    const isRightSide = x > center;
+  //   // Determine if label should be on left or right side
+  //   const isRightSide = x > center;
 
-    return { x, y, isRightSide, middleAngle };
-  };
+  //   return { x, y, isRightSide, middleAngle };
+  // };
 
   const chartSegments = generateChart();
 
@@ -326,7 +326,7 @@ const TokenomicsSection = () => {
             </svg>
 
             {/* Labels - only show on desktop or selected ones on mobile */}
-            <div className="absolute inset-0">
+            {/* <div className="absolute inset-0">
               {tokenomicsData.map((item, index) => {
                 // On mobile, only show labels for segments > 10%
                 if (isMobile && item.percentage < 10) return null;
@@ -369,7 +369,7 @@ const TokenomicsSection = () => {
                   </motion.div>
                 );
               })}
-            </div>
+            </div> */}
 
             {/* Custom tooltip with glass effect */}
             {activeSegment !== null && (

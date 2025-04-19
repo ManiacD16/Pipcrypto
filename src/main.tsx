@@ -8,7 +8,7 @@ import { createAppKit } from "@reown/appkit/react";
 import { EthersAdapter } from "@reown/appkit-adapter-ethers";
 import { bscTestnet, mainnet, sepolia } from "@reown/appkit/networks";
 import type { AppKitNetwork } from "@reown/appkit/networks";
-import App from "./App.tsx"; // or wherever your App component is located
+import App from "./App.tsx";
 
 // Configuration Constants
 const PROJECT_ID = "224382cc5c46b1c10cdecbd4059dff6e";
@@ -16,8 +16,8 @@ const METADATA = {
   name: "ITC Community",
   description:
     "Join our community and explore the future of technology and innovation. We're dedicated to creating meaningful connections and fostering growth.",
-  url: "https://cryptomx.site/",
-  icons: ["https://cticlub.org/assets/images/brand/itclogow.png"],
+  url: "https://localhost:5173/",
+  icons: ["https://localhost:5173/"],
 };
 const NETWORKS = [bscTestnet, mainnet, sepolia] as [
   AppKitNetwork,

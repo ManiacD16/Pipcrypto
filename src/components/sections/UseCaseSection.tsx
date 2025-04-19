@@ -145,7 +145,7 @@ const SolutionSection: React.FC = () => {
                     alt={card.title}
                     className="w-20 h-20 object-contain mb-5"
                   /> */}
-                  <div className="text-5xl text-left mb-8 object-contain">
+                  <div className="text-5xl text-center mb-8 object-contain">
                     {card.icon}
                   </div>
                   <h3 className="text-white text-lg font-semibold mb-3">
