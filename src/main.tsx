@@ -6,29 +6,21 @@ import { motion } from "framer-motion";
 import { AlertCircle, RefreshCw, HelpCircle } from "lucide-react";
 import { createAppKit } from "@reown/appkit/react";
 import { EthersAdapter } from "@reown/appkit-adapter-ethers";
-import { bscTestnet, mainnet, sepolia } from "@reown/appkit/networks";
-import type { AppKitNetwork } from "@reown/appkit/networks";
+import { mainnet, bsc } from "@reown/appkit/networks";
 import App from "./App.tsx";
 
-// Configuration Constants
 const PROJECT_ID = "224382cc5c46b1c10cdecbd4059dff6e";
 const METADATA = {
-  name: "ITC Community",
+  name: "IINGO Community",
   description:
     "Join our community and explore the future of technology and innovation. We're dedicated to creating meaningful connections and fostering growth.",
-  url: "https://localhost:5173/",
-  icons: ["https://localhost:5173/"],
+  url: "https://iingo.network/",
+  icons: ["https://iingo.network/assets/Logo1-692ba5f8.png"],
 };
-const NETWORKS = [bscTestnet, mainnet, sepolia] as [
-  AppKitNetwork,
-  ...AppKitNetwork[]
-];
 
-// Professional Error Boundary Component
 interface ErrorBoundaryProps {
   children: ReactNode;
 }
-
 interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
@@ -46,16 +38,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log the error to an error reporting service
     console.error("Uncaught error:", error, errorInfo);
-
-    // Optional: Send error to monitoring service
-    // this.logErrorToService(error, errorInfo);
   }
 
-  handleRefresh = () => {
-    window.location.reload();
-  };
+  handleRefresh = () => window.location.reload();
 
   handleContactSupport = () => {
     window.open(
@@ -76,10 +62,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
           >
             <div className="flex justify-center mb-6">
               <motion.div
-                animate={{
-                  rotate: [0, 10, -10, 0],
-                  scale: [1, 1.1, 1],
-                }}
+                animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
                 transition={{
                   duration: 0.5,
                   repeat: Infinity,
@@ -102,7 +85,6 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                 We encountered an unexpected error. Don't worry, we're on it!
               </p>
 
-              {/* Error Details (optional, can be toggled) */}
               <details className="text-left bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-6">
                 <summary className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300">
                   Error Details
@@ -143,10 +125,9 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 }
 
-// Create AppKit instance with current theme mode
 createAppKit({
   adapters: [new EthersAdapter()],
-  networks: NETWORKS,
+  networks: [mainnet, bsc],
   metadata: METADATA,
   projectId: PROJECT_ID,
   features: {
@@ -154,7 +135,6 @@ createAppKit({
   },
 });
 
-// Root Rendering with Error Boundary and AppKit Wrapper
 const root = createRoot(document.getElementById("root")!);
 root.render(
   <React.StrictMode>

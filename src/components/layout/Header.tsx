@@ -132,28 +132,23 @@ const Header: React.FC = () => {
               href="#"
               className="text-white hover:text-blue-400 transition-colors"
             >
-              ABOUT US
+              HOME
             </a>
             <a
               href="#"
               className="text-white hover:text-blue-400 transition-colors"
             >
-              OUR SERVICES
+              PRE SALE
             </a>
             <a
               href="#"
               className="text-white hover:text-blue-400 transition-colors"
             >
-              WORK WITH US
+              WHITEPAPER
             </a>
-            <a
-              href="#"
-              className="text-white hover:text-blue-400 transition-colors"
-            >
-              BLOG
-            </a>
+
             <Button variant="primary" onClick={() => navigate("/login")}>
-              GET IN TOUCH
+              GET AIRDROP
             </Button>
           </div>
         </div>

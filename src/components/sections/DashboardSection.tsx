@@ -166,7 +166,7 @@ const DashboardSection: React.FC = () => {
     let textToCopy = text;
     navigator.clipboard.writeText(text);
     if (type === "referral") {
-      textToCopy = `https://pipcrypto.vercel.app/?ref=${text}`;
+      textToCopy = `https://iingo.network/?ref=${text}`;
     }
     navigator.clipboard.writeText(textToCopy);
     // Show toast based on what was copied

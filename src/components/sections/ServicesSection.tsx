@@ -1,147 +1,138 @@
-import React from "react";
-import LearnMoreLink from "../ui/LearnMoreLink";
+// import React, { useEffect, useState } from "react";
+// import LearnMoreLink from "../ui/LearnMoreLink";
 import One from "../../assets/Images/1.svg";
 import Grid from "../../assets/Images/grid.svg";
 import Exchange from "../../assets/Images/exchange.svg";
-// import CountdownTimer from "../ui/CountdownTimer";
-// import Button from "../ui/Button";
 
 const ServicesSection: React.FC = () => {
-  // Set the target date for the countdown (3 days, 23 hours, 19 minutes, 56 seconds from now)
-  const targetDate = new Date();
-  targetDate.setDate(targetDate.getDate() + 3);
-  targetDate.setHours(targetDate.getHours() + 23);
-  targetDate.setMinutes(targetDate.getMinutes() + 19);
-  targetDate.setSeconds(targetDate.getSeconds() + 56);
-
   return (
-    <section className="w-full min-h-[80vh]  flex flex-col items-center justify-center text-center px-4 py-12 z-10">
-      <h1 className="text-4xl md:text-6xl font-semibold text-white mb-8">
-        Crypto Market Making
-      </h1>
+    <section className="w-full min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center text-center px-4 py-16 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600 rounded-full opacity-10 blur-3xl"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-blue-600 rounded-full opacity-10 blur-3xl"></div>
+        <div className="absolute top-10 right-10 w-2 h-2 bg-purple-400 rounded-full shadow-lg shadow-purple-500/50"></div>
+        <div className="absolute bottom-10 left-10 w-3 h-3 bg-blue-400 rounded-full shadow-lg shadow-blue-500/50"></div>
 
-      {/* <div className="flex lg:w-3/5 lg:ml-8 mb-4">
-        <div className="w-4 h-8 bg-red-500 mr-3 rounded-sm"></div>
-        <span className="text-red-500 font-medium mt-1">Today's</span>
+        {/* Grid background */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNNjAgMzBjMCAxNi41NjktMTMuNDMxIDMwLTMwIDMwQzEzLjQzMSA2MCAwIDQ2LjU2OSAwIDMwIDAgMTMuNDMxIDEzLjQzMSAwIDMwIDBjMTYuNTY5IDAgMzAgMTMuNDMxIDMwIDMweiIgc3Ryb2tlPSIjMzAzMDQ1IiBzdHJva2Utd2lkdGg9Ii41Ii8+PC9nPjwvc3ZnPg==')] opacity-5"></div>
       </div>
-      <div className="lg:flex lg:items-center lg:space-x-20 mt-2">
-        <h2 className="text-3xl md:text-5xl font-semibold text-white mb-8">
-          Flash Sales
-        </h2>
 
-        <div className="mb-12">
-          <CountdownTimer targetDate={targetDate} />
-        </div>
-      </div> */}
-      <p className="max-w-xl text-gray-300 mb-12 leading-relaxed">
-        We are a global crypto liquidity provider and algorithmic market maker.
-        We trade digital assets listed on Centralized Exchanges in over 15
-        countries worldwide.
-      </p>
-      <div className="flex flex-col lg:flex-row w-3/4 md:space-y-10 lg:space-y-0">
-        {/* Left Section */}
-        <div className="lg:w-1/2 w-full p-4 lg:text-left">
-          <h1 className="text-2xl md:text-3xl lg:w-3/4 w-full font-thin text-white mb-8">
-            Market Making for Crypto Projects
+      <div className="relative z-10 w-full max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-16 relative">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
+              Crypto Market Making
+            </span>
           </h1>
-          <h1 className="text-md md:text-lg lg:w-3/4 w-full font-semibold text-white mb-8">
-            Accelerate your token’s journey by boosting its liquidity
-          </h1>
-          <p className="lg:w-3/4 w-full text-gray-300 mb-8 leading-relaxed">
-            We invest in building long-term, sustainable relationships and
-            support our projects in their growth journey with our services,
-            industry expertise and network.
+
+          <p className="max-w-2xl mx-auto text-lg text-gray-300 mb-8 leading-relaxed">
+            We are a global crypto liquidity provider and algorithmic market
+            maker. We trade digital assets listed on Centralized Exchanges in
+            over 15 countries worldwide.
           </p>
-          <LearnMoreLink />
         </div>
 
-        {/* Right Section */}
-        <img
-          src={One}
-          alt="Crypto visual"
-          className="w-full max-w-md object-contain"
-        />
-      </div>
-      <div className="flex flex-col lg:flex-row w-3/4 md:space-y-10 lg:space-y-0 lg:space-x-40 mt-20">
-        {/* Left Section - Moved to bottom on small screens */}
-        <div className="order-2 lg:order-1 lg:w-1/2 w-full lg:p-4 p-0 mt-40 lg:mt-0">
-          {/* Container with relative positioning to contain all elements */}
-          <div className="relative w-full h-[400px] md:h-[500px] lg:ml-0 md:ml-[25%]">
-            {/* Gradient background */}
-            <div
-              className="
-    absolute 
-    w-[300px] sm:w-[40rem] md:w-[40rem] lg:w-[40rem] 
-    h-[300px] sm:h-[500px] md:h-[500px] lg:h-[500px] 
-    overlay z-0 
-    left-0 sm:-left-28 md:-left-32 lg:-left-32
-    bottom-0 sm:-bottom-10 md:bottom-20 lg:bottom-20
-    bg-[radial-gradient(circle,#665DCD,transparent_60%)] 
-    opacity-80 
-    pointer-events-none
-    rounded-full
-  "
-            >
-              {" "}
-              {/* <div className="relative inset-0 bg-black opacity-45" /> */}
+        {/* First Section */}
+        <div className="flex flex-col lg:flex-row w-full gap-12 mb-24">
+          {/* Left Content */}
+          <div className="lg:w-1/2 w-full p-4 lg:text-left flex flex-col justify-center">
+            <div className="relative mb-6">
+              <div className="absolute -left-4 top-0 h-full w-1 bg-gradient-to-b from-purple-500 to-blue-500 rounded-full"></div>
+              <h2 className="text-2xl md:text-3xl font-light text-white mb-2">
+                Market Making for Crypto Projects
+              </h2>
             </div>
 
-            {/* Exchange image */}
-            <div className="absolute top-4 left-0 w-full z-50">
-              <img
-                src={Exchange}
-                alt="Exchange Screens"
-                className="w-full max-w-sm object-contain"
-              />
-            </div>
+            <h3 className="text-lg md:text-xl font-semibold text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-blue-300">
+              Accelerate your token's journey by boosting its liquidity
+            </h3>
 
-            {/* Grid image */}
-            <div className="absolute top-[152px] left-0 w-full z-10">
-              <img
-                src={Grid}
-                alt="Grid"
-                className="w-full max-w-sm object-contain"
-              />
-            </div>
+            <p className="text-gray-300 mb-8 leading-relaxed">
+              We invest in building long-term, sustainable relationships and
+              support our projects in their growth journey with our services,
+              industry expertise and network.
+            </p>
+
+            {/* <div className="group w-fit">
+              <LearnMoreLink />
+              <div className="w-0 group-hover:w-full h-px bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-300"></div>
+            </div> */}
+          </div>
+
+          {/* Right Image */}
+          <div className="lg:w-1/2 w-full flex justify-center items-center relative">
+            {/* Decorative elements */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-blue-600/10 rounded-2xl transform rotate-3 scale-95"></div>
+            <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-blue-600/20 rounded-full blur-2xl"></div>
+
+            <img
+              src={One}
+              alt="Crypto visual"
+              className="w-full max-w-md object-contain relative z-10 hover:scale-105 transition-transform duration-500"
+            />
           </div>
         </div>
-        {/* Right Section - Moved to top on small screens */}
-        <div className="order-1 lg:order-2 lg:w-1/2 w-full p-4 lg:text-left">
-          <h1 className="text-2xl md:text-3xl lg:w-3/4 w-full font-thin text-white mb-8">
-            Market Making for Crypto Exchanges
-          </h1>
-          <h1 className="text-md md:text-lg w-full font-semibold text-white mb-8">
-            Attract more traders and projects with deep order books & liquidity
-          </h1>
-          <p className="w-full text-gray-300 mb-8 leading-relaxed">
-            Our world-class market making services are proven to help local and
-            emerging exchanges win traders and gain market-leading positions of
-            up to 90% market dominance.
-          </p>
-          <LearnMoreLink />
-        </div>
 
-        {/* Left Section - Moved to bottom on small screens */}
-        {/* <div className="order-2 lg:order-1 lg:w-1/2 w-full p-4 mt-8 lg:mt-0 ">
-          <div className="">
-            <div className="absolute w-[40rem] h-[40rem] overlay z-0 left-0 bottom-0 -mb-40 ml-20 bg-[radial-gradient(circle,#665DCD,transparent_60%)] opacity-80 pointer-events-none">
-              <div className="relative inset-0 bg-black opacity-45" />
+        {/* Second Section */}
+        <div className="flex flex-col-reverse lg:flex-row w-full gap-12">
+          {/* Left Exchange Visualization */}
+          <div className="lg:w-1/2 w-full flex justify-center items-center relative">
+            <div className="relative w-full h-[400px] md:h-[500px]">
+              {/* Gradient backdrop */}
+              <div className="absolute w-full h-full rounded-2xl bg-gradient-to-br from-purple-900/20 to-blue-900/20 backdrop-blur-sm transform -rotate-3"></div>
+
+              {/* Pulsing gradient */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-purple-600 rounded-full opacity-20 blur-3xl animate-pulse"></div>
+
+              {/* Exchange image */}
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 w-full z-30 drop-shadow-[0_20px_50px_rgba(120,80,220,0.3)]">
+                <img
+                  src={Exchange}
+                  alt="Exchange Screens"
+                  className="w-full max-w-sm mx-auto object-contain hover:scale-105 transition-all duration-700"
+                />
+              </div>
+
+              {/* Grid image */}
+              <div className="absolute top-[152px] left-1/2 -translate-x-1/2 w-full z-20">
+                <img
+                  src={Grid}
+                  alt="Grid"
+                  className="w-full max-w-sm mx-auto object-contain opacity-80"
+                />
+              </div>
             </div>
           </div>
-          <img
-            src={Exchange}
-            alt="Exchange Screens"
-            className="absolute w-full max-w-md object-contain z-50 -mt-5"
-          />
-          <img
-            src={Grid}
-            alt="Grid"
-            className="absolute w-full max-w-md object-contain z-10 mt-[152px]"
-          />
-        </div> */}
-      </div>
 
-      {/* <Button variant="primary">GET IN TOUCH</Button> */}
+          {/* Right Content */}
+          <div className="lg:w-1/2 w-full p-4 lg:text-left flex flex-col justify-center">
+            <div className="relative mb-6">
+              <div className="absolute -left-4 top-0 h-full w-1 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
+              <h2 className="text-2xl md:text-3xl font-light text-white mb-2">
+                Market Making for Crypto Exchanges
+              </h2>
+            </div>
+
+            <h3 className="text-lg md:text-xl font-semibold text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300">
+              Attract more traders and projects with deep order books &
+              liquidity
+            </h3>
+
+            <p className="text-gray-300 mb-8 leading-relaxed">
+              Our world-class market making services are proven to help local
+              and emerging exchanges win traders and gain market-leading
+              positions of up to 90% market dominance.
+            </p>
+
+            {/* <div className="group w-fit">
+              <LearnMoreLink />
+              <div className="w-0 group-hover:w-full h-px bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"></div>
+            </div> */}
+          </div>
+        </div>
+      </div>
     </section>
   );
 };
